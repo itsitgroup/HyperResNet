@@ -6,8 +6,9 @@ from model_utils import create_model
 from plot_utils import plot_history, plot_predictions
 from sklearn.model_selection import train_test_split
 from keras.models import load_model
+from keras.callbacks import ModelCheckpoint
 
-def main(model_path=None):
+def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_every):
     # Check if TensorFlow is using GPU
     physical_devices = tf.config.list_physical_devices('GPU')
     if physical_devices:
@@ -45,10 +46,10 @@ def main(model_path=None):
         except Exception as e:
             print(f"Error loading model: {e}")
             print("Training a new model instead...")
-            model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path)
+            model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every)
     else:
         print("Training new model...")
-        model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path)
+        model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every)
 
     # Evaluate the model on the testing set
     loss, accuracy = model.evaluate([X_hi_res_rgb_test, X_low_res_hsi_test], y_test)
@@ -59,19 +60,26 @@ def main(model_path=None):
     predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
     plot_predictions(predictions, y_test)
 
-def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path):
-    model = create_model()
+def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every):
+    model = create_model(filters, blocks, learning_rate)
     model.summary()
+
+    callbacks = []
+    if save_every:
+        checkpoint_path = model_path.replace('.h5', '_epoch_{epoch:02d}.h5')
+        checkpoint_callback = ModelCheckpoint(checkpoint_path, save_weights_only=False, period=save_every)
+        callbacks.append(checkpoint_callback)
 
     history = model.fit(
         [X_hi_res_rgb_train, X_low_res_hsi_train],
         y_train,
-        batch_size=32,
-        epochs=10,
-        validation_data=([X_hi_res_rgb_test, X_low_res_hsi_test], y_test)
+        batch_size=batch_size,
+        epochs=epochs,
+        validation_data=([X_hi_res_rgb_test, X_low_res_hsi_test], y_test),
+        callbacks=callbacks
     )
 
-    if model_path:
+    if not save_every:
         model.save(model_path)
         print(f"Model saved to {model_path}")
 
@@ -80,7 +88,13 @@ def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_h
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train or load a superresolution model.')
-    parser.add_argument('--model_path', type=str, default=None, help='Path to the model file to load.')
-    
+    parser.add_argument('--model_path', type=str, default='my_model.h5', help='Path to the model file to load.')
+    parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training.')
+    parser.add_argument('--epochs', type=int, default=10, help='Number of epochs for training.')
+    parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate for the optimizer.')
+    parser.add_argument('--filters', type=int, default=64, help='Number of filters for the convolutional layers.')
+    parser.add_argument('--blocks', type=int, default=3, help='Number of residual blocks in the encoder and decoder.')
+    parser.add_argument('--save_every', type=int, default=0, help='Save the model every specified number of epochs. If 0, save only at the end.')
+
     args = parser.parse_args()
-    main(model_path=args.model_path)
+    main(model_path=args.model_path, batch_size=args.batch_size, epochs=args.epochs, learning_rate=args.learning_rate, filters=args.filters, blocks=args.blocks, save_every=args.save_every)
