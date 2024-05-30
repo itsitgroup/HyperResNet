@@ -20,7 +20,7 @@ def plot_history(history):
     plt.legend()
     plt.show()
 
-def plot_predictions(predictions, y_test):
+def plot_predictions(predictions, y_test, num_samples=10):
     max_pixel_value = 255
     y_test_adj = y_test * max_pixel_value
     predictions_adj = predictions * max_pixel_value
@@ -28,18 +28,18 @@ def plot_predictions(predictions, y_test):
     y_test_adj_avg = np.mean(y_test_adj[:, :, :, :3], axis=-1)
     predictions_adj_avg = np.mean(predictions_adj[:, :, :, :3], axis=-1)
 
-    fig, axs = plt.subplots(8, 8, figsize=(16, 16))
-    for i, ax in enumerate(axs.flat):
-        ax.imshow(y_test_adj_avg[i, :, :].astype(int), cmap='gray')
-        ax.set_title('Ground Truth')
-        ax.axis('off')
-    plt.tight_layout()
-    plt.show()
+    # Randomly select num_samples indices
+    indices = np.random.choice(len(y_test_adj), num_samples, replace=False)
 
-    fig, axs = plt.subplots(8, 8, figsize=(16, 16))
-    for i, ax in enumerate(axs.flat):
-        ax.imshow(predictions_adj_avg[i, :, :].astype(int), cmap='gray')
-        ax.set_title('Prediction')
-        ax.axis('off')
+    fig, axs = plt.subplots(2, num_samples, figsize=(num_samples * 2, 4))
+    for i, idx in enumerate(indices):
+        axs[0, i].imshow(y_test_adj_avg[idx, :, :].astype(int), cmap='gray')
+        axs[0, i].set_title('Ground Truth')
+        axs[0, i].axis('off')
+        
+        axs[1, i].imshow(predictions_adj_avg[idx, :, :].astype(int), cmap='gray')
+        axs[1, i].set_title('Prediction')
+        axs[1, i].axis('off')
+        
     plt.tight_layout()
     plt.show()
