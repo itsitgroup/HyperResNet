@@ -1,5 +1,9 @@
+Here is the updated `README.md` as per your instructions:
 
-# SuperResolution Using Machine Learning
+### README.md
+
+```markdown
+# HyperResNet: SuperResolution Using Machine Learning
 
 This project aims to achieve superresolution using machine learning models. Superresolution is a technique to enhance image resolution by combining information from multiple images of the same scene. In this project, we use RGB images with high spatial resolution and hyperspectral images with high spectral resolution to create images with both high spatial and spectral resolution.
 
@@ -37,7 +41,12 @@ The dataset used in this project is the CAVE multispectral image dataset by Colu
 
 1. Run the `main.py` script to download the dataset, preprocess the data, train the model, and visualize the results:
    ```bash
-   python main.py
+   python main.py --model_path my_model.h5
+   ```
+
+2. If you want to use a pre-trained model, specify the model path:
+   ```bash
+   python main.py --model_path path/to/your/model.h5
    ```
 
 ## Functions
@@ -61,7 +70,6 @@ The dataset used in this project is the CAVE multispectral image dataset by Colu
 ## Results
 
 The model will output high-resolution hyperspectral images. Training and validation loss, as well as accuracy, will be plotted. Predictions will be compared to the ground truth images.
-
 
 ### requirements.txt
 
