@@ -58,16 +58,18 @@ def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_ev
     print("Test loss:", loss)
     print("Test accuracy:", accuracy)
 
+    # Ensure the save_path directory exists
+    save_path = 'plots'
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+
     # Make predictions and plot them
     predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
-    plot_predictions(predictions, y_test, num_samples=10)  # Plot 10 random samples
-
-    # Plot training history
-    plot_history(history, save_path='plots')  # Save the plots
+    plot_predictions(predictions, y_test, num_samples=10, save_path=save_path)  # Save the plots
 
     # Plot training history if available
-    if history:
-        plot_history(history)
+    if history is not None:
+        plot_history(history, save_path=save_path)  # Save the plots
 
 def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every):
     model = create_model(filters, blocks, learning_rate)
