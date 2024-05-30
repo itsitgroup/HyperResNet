@@ -1,9 +1,12 @@
+import os
+import argparse
 from data_utils import download_and_extract_data, load_and_preprocess_images, generate_low_res_hsi_and_high_res_rgb, normalize_data
 from model_utils import create_model
 from plot_utils import plot_history, plot_predictions
 from sklearn.model_selection import train_test_split
+from keras.models import load_model
 
-def main():
+def main(model_path=None):
     data_url = 'https://www1.cs.columbia.edu/CAVE/databases/multispectral/zip/complete_ms_data.zip'
     root_folder = 'complete_ms_data'
     target_size = 64
@@ -25,6 +28,28 @@ def main():
     X_low_res_hsi_train, X_low_res_hsi_test, X_hi_res_rgb_train, X_hi_res_rgb_test, y_train, y_test = normalize_data(
         X_low_res_hsi_train, X_low_res_hsi_test, X_hi_res_rgb_train, X_hi_res_rgb_test, y_train, y_test)
 
+    if model_path and os.path.exists(model_path):
+        try:
+            print(f"Loading model from {model_path}...")
+            model = load_model(model_path)
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            print("Training a new model instead...")
+            model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path)
+    else:
+        print("Training new model...")
+        model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path)
+
+    # Evaluate the model on the testing set
+    loss, accuracy = model.evaluate([X_hi_res_rgb_test, X_low_res_hsi_test], y_test)
+    print("Test loss:", loss)
+    print("Test accuracy:", accuracy)
+
+    # Make predictions and plot them
+    predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
+    plot_predictions(predictions, y_test)
+
+def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path):
     model = create_model()
     model.summary()
 
@@ -36,15 +61,16 @@ def main():
         validation_data=([X_hi_res_rgb_test, X_low_res_hsi_test], y_test)
     )
 
-    loss, accuracy = model.evaluate([X_hi_res_rgb_test, X_low_res_hsi_test], y_test)
-    print("Test loss:", loss)
-    print("Test accuracy:", accuracy)
-    model.save("my_model.h5")
+    if model_path:
+        model.save(model_path)
+        print(f"Model saved to {model_path}")
 
     plot_history(history)
-
-    predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
-    plot_predictions(predictions, y_test)
+    return model
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Train or load a superresolution model.')
+    parser.add_argument('--model_path', type=str, default=None, help='Path to the model file to load.')
+    
+    args = parser.parse_args()
+    main(model_path=args.model_path)
