@@ -101,4 +101,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate for the optimizer.')
     parser.add_argument('--filters', type=int, default=64, help='Number of filters for the convolutional layers.')
     parser.add_argument('--blocks', type=int, default=3, help='Number of residual blocks in the encoder and decoder.')
-    parser.add_argument('--save_every', type=int, default=0, help='Save the model every specified number of epochs. If 0
+    parser.add_argument('--save_every', type=int, default=0, help='Save the model every specified number of epochs. If 0, save only at the end.')
+
+    args = parser.parse_args()
+    main(model_path=args.model_path, batch_size=args.batch_size, epochs=args.epochs, learning_rate=args.learning_rate, filters=args.filters, blocks=args.blocks, save_every=args.save_every)
