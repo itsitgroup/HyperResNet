@@ -1,8 +1,3 @@
-Here is the updated `README.md` as per your instructions:
-
-### README.md
-
-```markdown
 # HyperResNet: SuperResolution Using Machine Learning
 
 This project aims to achieve superresolution using machine learning models. Superresolution is a technique to enhance image resolution by combining information from multiple images of the same scene. In this project, we use RGB images with high spatial resolution and hyperspectral images with high spectral resolution to create images with both high spatial and spectral resolution.
