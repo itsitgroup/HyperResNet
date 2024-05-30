@@ -17,8 +17,8 @@ The dataset used in this project is the CAVE multispectral image dataset by Colu
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/superresolution-ml.git
-   cd superresolution-ml
+   git clone https://github.com/itsitgroup/HyperResNet.git
+   cd HyperResNet
    ```
 
 2. Create a virtual environment and activate it:
