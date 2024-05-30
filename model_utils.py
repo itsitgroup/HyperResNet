@@ -9,6 +9,8 @@ def create_residual_block(input_layer, num_filters, kernel_size=(3, 3)):
     x = LeakyReLU()(x)
     x = Conv2D(num_filters, kernel_size, padding='same')(x)
     x = BatchNormalization()(x)
+    if input_layer.shape[-1] != num_filters:
+        input_layer = Conv2D(num_filters, (1, 1), padding='same')(input_layer)
     return Add()([input_layer, x])
 
 def create_attention_block(input_layer, num_filters):
@@ -52,7 +54,7 @@ def create_model():
     
     fused = concatenate([rgb_branch, hsi_branch])
     
-    decoder_output = decoder(fused, 64, 3)
+    decoder_output = decoder(fused, 128, 3)  # Adjusted num_filters to match encoder output
     output = Conv2D(31, (3, 3), activation='sigmoid', padding='same')(decoder_output)
 
     model = Model(inputs=[hi_res_rgb_input, low_res_hsi_input], outputs=[output])
