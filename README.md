@@ -33,7 +33,9 @@ The dataset used in this project is the CAVE multispectral image dataset by Colu
    ```
 
 ## Usage
-
+<a target="_blank" href="https://colab.research.google.com/github/itsitgroup/HyperResNet/blob/main/HyperResNet.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 ### Command Line Arguments
 
 You can customize the training process by using the following command-line arguments:
