@@ -46,10 +46,10 @@ def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_ev
         except Exception as e:
             print(f"Error loading model: {e}")
             print("Training a new model instead...")
-            model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every)
+            model, history = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every)
     else:
         print("Training new model...")
-        model = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every)
+        model, history = create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every)
 
     # Evaluate the model on the testing set
     loss, accuracy = model.evaluate([X_hi_res_rgb_test, X_low_res_hsi_test], y_test)
@@ -60,14 +60,19 @@ def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_ev
     predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
     plot_predictions(predictions, y_test)
 
+    # Plot training history
+    plot_history(history)
+
 def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every):
     model = create_model(filters, blocks, learning_rate)
     model.summary()
 
     callbacks = []
     if save_every:
+        steps_per_epoch = len(X_hi_res_rgb_train) // batch_size
+        save_freq = steps_per_epoch * save_every
         checkpoint_path = model_path.replace('.h5', '_epoch_{epoch:02d}.h5')
-        checkpoint_callback = ModelCheckpoint(checkpoint_path, save_weights_only=False, period=save_every)
+        checkpoint_callback = ModelCheckpoint(checkpoint_path, save_weights_only=False, save_freq=save_freq)
         callbacks.append(checkpoint_callback)
 
     history = model.fit(
@@ -83,8 +88,7 @@ def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_h
         model.save(model_path)
         print(f"Model saved to {model_path}")
 
-    plot_history(history)
-    return model
+    return model, history
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train or load a superresolution model.')
