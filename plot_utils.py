@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_history(history):
+def plot_history(history, save_path=None):
     plt.figure(figsize=(12, 6))
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
@@ -9,8 +9,12 @@ def plot_history(history):
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Validation'], loc='upper right')
-    plt.show()
-
+    
+    if save_path:
+        plt.savefig(f'{save_path}/loss.png')
+    else:
+        plt.show()
+    
     plt.figure(figsize=(8, 6))
     plt.plot(history.history['accuracy'], label='Training Accuracy')
     plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
@@ -18,9 +22,13 @@ def plot_history(history):
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.legend()
-    plt.show()
+    
+    if save_path:
+        plt.savefig(f'{save_path}/accuracy.png')
+    else:
+        plt.show()
 
-def plot_predictions(predictions, y_test, num_samples=10):
+def plot_predictions(predictions, y_test, num_samples=10, save_path=None):
     max_pixel_value = 255
     y_test_adj = y_test * max_pixel_value
     predictions_adj = predictions * max_pixel_value
@@ -42,4 +50,8 @@ def plot_predictions(predictions, y_test, num_samples=10):
         axs[1, i].axis('off')
         
     plt.tight_layout()
-    plt.show()
+    
+    if save_path:
+        plt.savefig(f'{save_path}/predictions.png')
+    else:
+        plt.show()
