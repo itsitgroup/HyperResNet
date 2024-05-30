@@ -39,6 +39,8 @@ def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_ev
     X_low_res_hsi_train, X_low_res_hsi_test, X_hi_res_rgb_train, X_hi_res_rgb_test, y_train, y_test = normalize_data(
         X_low_res_hsi_train, X_low_res_hsi_test, X_hi_res_rgb_train, X_hi_res_rgb_test, y_train, y_test)
 
+    history = None  # Initialize history variable
+
     if model_path and os.path.exists(model_path):
         try:
             print(f"Loading model from {model_path}...")
@@ -60,8 +62,9 @@ def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_ev
     predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
     plot_predictions(predictions, y_test)
 
-    # Plot training history
-    plot_history(history)
+    # Plot training history if available
+    if history:
+        plot_history(history)
 
 def create_and_train_model(X_hi_res_rgb_train, X_low_res_hsi_train, y_train, X_hi_res_rgb_test, X_low_res_hsi_test, y_test, model_path, batch_size, epochs, learning_rate, filters, blocks, save_every):
     model = create_model(filters, blocks, learning_rate)
@@ -98,7 +101,4 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate for the optimizer.')
     parser.add_argument('--filters', type=int, default=64, help='Number of filters for the convolutional layers.')
     parser.add_argument('--blocks', type=int, default=3, help='Number of residual blocks in the encoder and decoder.')
-    parser.add_argument('--save_every', type=int, default=0, help='Save the model every specified number of epochs. If 0, save only at the end.')
-
-    args = parser.parse_args()
-    main(model_path=args.model_path, batch_size=args.batch_size, epochs=args.epochs, learning_rate=args.learning_rate, filters=args.filters, blocks=args.blocks, save_every=args.save_every)
+    parser.add_argument('--save_every', type=int, default=0, help='Save the model every specified number of epochs. If 0
