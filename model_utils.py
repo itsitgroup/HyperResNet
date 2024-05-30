@@ -44,21 +44,21 @@ def decoder(input_layer, num_filters, num_blocks):
     x = LeakyReLU()(x)
     return x
 
-def create_model():
+def create_model(filters, blocks, learning_rate):
     hi_res_rgb_input = Input(shape=(64, 64, 3))
     low_res_hsi_input = Input(shape=(8, 8, 31))
 
-    rgb_branch = encoder(hi_res_rgb_input, 64, 3)
+    rgb_branch = encoder(hi_res_rgb_input, filters, blocks)
     upsampled_hsi_branch = UpSampling2D(size=(8, 8))(low_res_hsi_input)
-    hsi_branch = encoder(upsampled_hsi_branch, 64, 3)
+    hsi_branch = encoder(upsampled_hsi_branch, filters, blocks)
     
     fused = concatenate([rgb_branch, hsi_branch])
     
-    decoder_output = decoder(fused, 128, 3)  # Adjusted num_filters to match encoder output
+    decoder_output = decoder(fused, filters * 2, blocks)  # Adjusted num_filters to match encoder output
     output = Conv2D(31, (3, 3), activation='sigmoid', padding='same')(decoder_output)
 
     model = Model(inputs=[hi_res_rgb_input, low_res_hsi_input], outputs=[output])
-    optimizer = Adam(learning_rate=0.0001)
+    optimizer = Adam(learning_rate=learning_rate)
     model.compile(optimizer=optimizer, loss='mean_squared_error', metrics=['accuracy'])
 
     return model
