@@ -1,5 +1,6 @@
 import os
 import argparse
+import tensorflow as tf
 from data_utils import download_and_extract_data, load_and_preprocess_images, generate_low_res_hsi_and_high_res_rgb, normalize_data
 from model_utils import create_model
 from plot_utils import plot_history, plot_predictions
@@ -7,6 +8,15 @@ from sklearn.model_selection import train_test_split
 from keras.models import load_model
 
 def main(model_path=None):
+    # Check if TensorFlow is using GPU
+    physical_devices = tf.config.list_physical_devices('GPU')
+    if physical_devices:
+        print(f"GPUs available: {len(physical_devices)}")
+        for device in physical_devices:
+            print(f"Device: {device}")
+    else:
+        print("No GPU available, using CPU instead.")
+
     data_url = 'https://www1.cs.columbia.edu/CAVE/databases/multispectral/zip/complete_ms_data.zip'
     root_folder = 'complete_ms_data'
     target_size = 64
