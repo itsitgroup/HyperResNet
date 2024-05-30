@@ -60,7 +60,8 @@ def main(model_path, batch_size, epochs, learning_rate, filters, blocks, save_ev
 
     # Make predictions and plot them
     predictions = model.predict([X_hi_res_rgb_test, X_low_res_hsi_test])
-    plot_predictions(predictions, y_test)
+    plot_predictions(predictions, y_test, num_samples=10)  # Plot 10 random samples
+
 
     # Plot training history if available
     if history:
