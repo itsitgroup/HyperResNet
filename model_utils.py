@@ -1,6 +1,6 @@
 from keras.models import Model
 from keras.layers import Input, Conv2D, MaxPooling2D, Conv2DTranspose, concatenate, UpSampling2D
-from keras.layers import BatchNormalization, Dropout, LeakyReLU, Add, Dense, Flatten, Reshape, Multiply
+from keras.layers import BatchNormalization, Dropout, LeakyReLU, Add, Dense, Flatten, Reshape, Multiply, GlobalAveragePooling2D
 from keras.optimizers import Adam
 
 def create_residual_block(input_layer, num_filters, kernel_size=(3, 3)):
