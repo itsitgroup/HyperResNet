@@ -39,14 +39,28 @@ The dataset used in this project is the CAVE multispectral image dataset by Colu
 
 ## Usage
 
-1. Run the `main.py` script to download the dataset, preprocess the data, train the model, and visualize the results:
+### Command Line Arguments
+
+You can customize the training process by using the following command-line arguments:
+
+- `--model_path`: Path to save or load the model (default: `my_model.h5`).
+- `--batch_size`: Batch size for training (default: `32`).
+- `--epochs`: Number of epochs for training (default: `10`).
+- `--learning_rate`: Learning rate for the optimizer (default: `0.0001`).
+- `--filters`: Number of filters for the convolutional layers (default: `64`).
+- `--blocks`: Number of residual blocks in the encoder and decoder (default: `3`).
+- `--save_every`: Save the model every specified number of epochs. If `0`, save only at the end (default: `0`).
+
+### Examples
+
+1. Run the script with default values:
    ```bash
    python main.py --model_path my_model.h5
    ```
 
-2. If you want to use a pre-trained model, specify the model path:
+2. Specify custom hyperparameters and save the model every 5 epochs:
    ```bash
-   python main.py --model_path path/to/your/model.h5
+   python main.py --model_path my_model.h5 --batch_size 64 --epochs 20 --learning_rate 0.001 --filters 128 --blocks 4 --save_every 5
    ```
 
 ## Functions
